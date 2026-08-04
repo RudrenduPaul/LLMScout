@@ -1,7 +1,7 @@
 {
   "name": "llmscout-cli",
-  "version": "0.3.4",
-  "description": "Zero-dependency, cross-platform LLM/GEO/AEO checker CLI — 21 technical-SEO and generative-engine-optimization checks, no headless browser, no Python interpreter required.",
+  "version": "0.3.5",
+  "description": "Cross-platform LLM/GEO/AEO checker CLI in TypeScript. 21 technical-SEO and generative-engine-optimization checks, two runtime dependencies (cheerio, commander), no Python interpreter or headless browser required.",
   "keywords": [
     "llm",
     "geo",
@@ -20,7 +20,9 @@
     "chatgpt",
     "perplexity",
     "claude",
-    "google-ai-overviews"
+    "google-ai-overviews",
+    "claude-code",
+    "agent-native"
   ],
   "homepage": "https://github.com/RudrenduPaul/LLMScout#readme",
   "bugs": {
