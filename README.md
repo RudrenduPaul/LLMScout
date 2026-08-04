@@ -22,6 +22,7 @@ Runs 21 technical-SEO and GEO (generative-engine-optimization) checks against yo
 - [The 21 checks](#the-21-checks)
 - [CLI reference](#cli-reference)
 - [Fleet mode](#fleet-mode)
+- [Library API reference](#library-api-reference)
 - [Comparison](#comparison)
 - [What is LLMScout, and why does it exist](#what-is-llmscout-and-why-does-it-exist)
 - [FAQ](#faq)
@@ -80,7 +81,7 @@ Search traffic is genuinely shifting toward AI-mediated answers, and the shift i
 - **Fleet mode with per-site reports.** `llmscout fleet manifest.json` runs the full suite across many local client-repo paths in one invocation, and `--out-dir` writes one auto-named report file per site -- built for agencies checking many client sites at once.
 - **Structured output.** Every command accepts a global `--json` flag for machine-readable output, so an agent invoking the CLI can parse results programmatically.
 - **A real, configurable User-Agent.** Sends a genuine browser User-Agent by default (some SSR frameworks and CDNs reject bot-style strings outright) and a `--user-agent` flag to override it.
-- **Well tested.** 247 TypeScript tests and 233 Python tests, both `npm audit` and the Python build reporting zero vulnerabilities (reproducible locally with `npm run test:coverage` and `npm audit`).
+- **Well tested.** 248 TypeScript tests and 233 Python tests, both reproducible locally with `npm test` / `npm run test:coverage` and `pytest`. The Python distribution has zero runtime dependencies, so there is nothing for a dependency audit to flag. On the npm side, `npm audit` currently reports one high-severity advisory in `undici`, a transitive dependency pulled in by `cheerio`, not in this project's own code.
 
 ## Quickstart
 
@@ -319,6 +320,48 @@ Fleet summary: 1 site(s) passed, 1 site(s) failed, 0 site(s) errored (2 total).
 
 Add `--out-dir ./reports` and each site's result is also written to its own auto-named file (`client-a.txt`, `client-b.txt`, or `.json` with `--json`) -- instead of one combined stdout dump, an agency running this across many client sites gets one distinguishable report per client. Each manifest entry's `path` resolves against the manifest file's own directory, not the process working directory, so the same manifest works no matter where you invoke it from. Everything is local filesystem access, with no SSH and no remote-execution surface.
 
+## Library API reference
+
+Both distributions are also genuinely importable libraries, not just CLIs. The exports below are real (grepped from `src/index.ts` and `python/src/llmscout/__init__.py`), and the examples are tested against the published packages, not written from memory.
+
+**TypeScript (`llmscout-cli` on npm):**
+
+```ts
+import { loadSite, runChecks, ALL_CHECKS } from "llmscout-cli";
+
+const ctx = await loadSite("https://example.com");
+const results = await runChecks(ALL_CHECKS, ctx);
+console.log(results[0].status, results[0].name);
+// "PASS" "Title tag"
+```
+
+| Export | Signature | What it does |
+| --- | --- | --- |
+| `loadSite` | `(rawSiteUrl: string, fetchFn?: FetchFn) => Promise<CheckContext>` | Validates the URL, fetches the site's resources, and builds a `CheckContext` in one call. What `check` and `fleet` both call internally. |
+| `fetchSiteResources` | `(siteUrl: URL, fetchFn?: FetchFn) => Promise<SiteResources>` | Lower-level: fetches the homepage plus robots.txt/sitemap.xml/llms.txt in parallel, without building a `CheckContext`. |
+| `buildCheckContext` | `(resources: SiteResources, fetchFn?: FetchFn) => CheckContext` | Builds a `CheckContext` from resources you already fetched (parses the homepage once with cheerio). |
+| `runChecks` | `(checks: Check[], ctx: CheckContext) => Promise<CheckResult[]>` | Runs a list of checks against one context. A check that throws becomes a `FAIL` result instead of aborting the run. |
+| `hasFailure` | `(results: CheckResult[]) => boolean` | `true` if any result's `status` is `"FAIL"`. |
+| `ALL_CHECKS` / `TECHNICAL_CHECKS` / `GEO_CHECKS` | `Check[]` | The full check suite, or just one of the two categories. |
+| `initProject` | `(targetPath: string, opts?: { siteUrl?: string }) => InitResult` | Scaffolds `llmscout.json` and the Claude Code skill file. Idempotent. |
+| `loadFleetManifest` / `runFleet` | see `src/fleet.ts` | Load a fleet manifest and run the suite across every site in it. |
+| `safeFetch` / `assertHttpUrl` | see `src/fetch-utils.ts` | The hardened fetch wrapper described in [Features](#features), exported for reuse in a custom check. |
+
+Types: `Check`, `CheckContext`, `CheckResult`, `CheckStatus` (`"PASS" \| "FAIL" \| "WARN"`), `CheckCategory` (`"technical" \| "geo"`), `SiteResources`, `LLMScoutConfig`, `FleetManifest`. No generated API docs site exists yet; this table and the source's own TSDoc comments are the reference.
+
+**Python (`llmscout-cli` on PyPI):**
+
+```python
+from llmscout import load_site, run_checks, ALL_CHECKS
+
+ctx = load_site("https://example.com")
+results = run_checks(ALL_CHECKS, ctx)
+print(results[0].status, results[0].name)
+# PASS Title tag
+```
+
+The Python package mirrors the TypeScript one function-for-function: `load_site`, `run_checks`, `has_failure`, `ALL_CHECKS`/`TECHNICAL_CHECKS`/`GEO_CHECKS`, `init_project`, `load_fleet_manifest`/`run_fleet`, `safe_fetch`/`assert_http_url`, `load_config`/`default_config`/`select_checks`, plus the `Check`, `CheckContext`, `CheckResult`, and `SiteResources` types. Full list in `python/src/llmscout/__init__.py`'s `__all__`. No generated Sphinx docs exist yet; the module docstring (`import llmscout; help(llmscout)`) and this table are the reference.
+
 ## Comparison
 
 Every cell below is drawn from a verifiable source (a repo file, a package manifest, or an open issue), cited under the table. "Checker" means the tool audits an existing live site; "generator" means it emits SEO/GEO asset files for you to publish.
@@ -391,7 +434,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide, covering both the T
 npm install
 npm run build       # tsc build to dist/
 npm run typecheck   # tsc --noEmit
-npm test            # vitest run (247 tests)
+npm test            # vitest run (248 tests)
 npm run test:coverage
 npm run lint        # eslint src test
 ```
