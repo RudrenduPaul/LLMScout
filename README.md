@@ -392,7 +392,7 @@ LLMScout is not a fork of either project. It shares no code with them, has a dif
 
 Beyond the install-fix wedge, LLMScout's checks track the concrete, evidence-backed direction the GEO space has actually moved since mid-2025 -- see [Why GEO checks matter right now](#why-geo-checks-matter-right-now) for the cited sources behind that claim, including the training-versus-search AI crawler split, Markdown content negotiation, and Google's own documented FAQ-rich-result deprecation.
 
-LLMScout is at v0.3, freshly renamed from its original name, SeoFleet. Both distributions are being republished under the new package name (`llmscout-cli` on both npm and PyPI) -- see [Install](#install) for both paths, and the badges above for live version status.
+LLMScout was freshly renamed from its original name, SeoFleet. Both distributions are being republished under the new package name (`llmscout-cli` on both npm and PyPI) -- see [Install](#install) for both paths, and the badges above for live version status.
 
 ## FAQ
 
