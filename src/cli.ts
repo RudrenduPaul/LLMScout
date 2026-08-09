@@ -1,6 +1,20 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { runInitCommand, runCheckCommand, runFleetCommand } from "./cli-lib.js";
+
+// Read the version from package.json at runtime instead of hardcoding it here,
+// so `llmscout --version` can never drift from the published package version
+// again (it previously did: this string was left at "0.3.0" across several
+// releases while package.json moved on to 0.3.5). dist/cli.js lives one
+// directory below the package root, and npm always includes package.json in
+// the published tarball regardless of the "files" field.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageJson = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf8")) as {
+  version: string;
+};
 
 const program = new Command();
 
@@ -9,7 +23,7 @@ program
   .description(
     "Zero-config, cross-platform SEO and GEO checks for local projects, with no Python or headless-browser dependency.",
   )
-  .version("0.3.0")
+  .version(packageJson.version)
   .option("--json", "output structured JSON instead of human-readable text", false)
   .option("--user-agent <string>", "override the default User-Agent header sent on outbound fetches");
 

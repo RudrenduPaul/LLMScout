@@ -1,10 +1,13 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const CLI = path.resolve(__dirname, "..", "dist", "cli.js");
+const PACKAGE_VERSION = (
+  JSON.parse(readFileSync(path.resolve(__dirname, "..", "package.json"), "utf-8")) as { version: string }
+).version;
 
 function runCli(args: string[]): { stdout: string; stderr: string; status: number } {
   try {
@@ -42,9 +45,12 @@ describe("CLI", () => {
   });
 
   it("prints the version", () => {
+    // Asserts against package.json's actual version rather than a hardcoded
+    // literal, so this test can't silently drift from the real published
+    // version the way the CLI's own `.version()` string once did.
     const { stdout, status } = runCli(["--version"]);
     expect(status).toBe(0);
-    expect(stdout.trim()).toBe("0.3.0");
+    expect(stdout.trim()).toBe(PACKAGE_VERSION);
   });
 
   it("scaffolds a real project directory via `init`", () => {

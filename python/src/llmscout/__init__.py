@@ -48,7 +48,17 @@ from .runner import has_failure, run_checks
 from .site_resources import build_check_context, fetch_site_resources, load_site
 from .types import Check, CheckContext, CheckResult, SiteResources
 
-__version__ = "0.3.3"
+from importlib import metadata as _metadata
+
+try:
+    # Read the version from the installed package's own metadata instead of
+    # hardcoding it here, so `llmscout --version` can never drift from the
+    # published PyPI version again (it previously did: this string was left
+    # at "0.3.3" while pyproject.toml moved on to 0.3.4). Works for both
+    # regular and editable (`pip install -e`) installs.
+    __version__ = _metadata.version("llmscout-cli")
+except _metadata.PackageNotFoundError:  # pragma: no cover - running from source without an install
+    __version__ = "0.0.0+unknown"
 
 __all__ = [
     "__version__",

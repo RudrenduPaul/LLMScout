@@ -5,6 +5,22 @@ changelog covers both distributions -- the npm package (`llmscout-cli`,
 TypeScript) and the PyPI package (`llmscout-cli`, Python) -- since they
 run the same checks; entries note which distribution they apply to.
 
+## [0.3.6] (npm) / [0.3.5] (PyPI) - 2026-08-08
+
+### Fixed
+
+- `llmscout --version` printed a stale, hardcoded version string that had
+  drifted from the actually published package version on both
+  distributions: npm printed `0.3.0` while the published package was
+  `0.3.5`, and PyPI printed `0.3.3` while the published package was
+  `0.3.4`. Both distributions now read their version from the package's
+  own metadata at runtime instead of a string literal that has to be
+  remembered on every release -- `package.json` via `fs.readFileSync` for
+  npm, `importlib.metadata.version("llmscout-cli")` for PyPI -- so this
+  class of drift cannot recur. Found via a real clean-install smoke test
+  (`npm pack` + global install from the tarball, and a fresh venv `pip
+  install`), not a code read.
+
 ## [0.3.0] - 2026-07-22
 
 ### Changed
