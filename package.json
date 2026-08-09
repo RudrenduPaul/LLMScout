@@ -71,5 +71,10 @@
   "dependencies": {
     "cheerio": "^1.2.0",
     "commander": "^12.1.0"
+  },
+  "overrides": {
+    "js-yaml": "^4.3.1",
+    "nanoid": "^3.3.17",
+    "undici": "^7.29.0"
   }
 }
