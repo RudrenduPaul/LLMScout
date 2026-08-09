@@ -205,6 +205,8 @@ llmscout --json check ./my-site
 }
 ```
 
+![Running llmscout --json check to produce structured JSON output with per-check id, status, message, and fix fields plus a summary object](./docs/json-output.gif)
+
 `check` exits `0` when no check FAILs, `1` when at least one check FAILs (WARN alone does not fail the run), and `2` on a usage error such as a missing or misconfigured `llmscout.json`.
 
 ## The 21 checks
