@@ -2,32 +2,18 @@
 
 # LLMScout
 
-Runs 21 technical-SEO and GEO (generative-engine-optimization) checks against your site, in pure TypeScript or pure Python, with zero Python interpreter, zero headless browser, and zero external toolchain either way.
-
 [![CI](https://github.com/RudrenduPaul/LLMScout/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/LLMScout/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/llmscout-cli.svg)](https://www.npmjs.com/package/llmscout-cli)
 [![PyPI version](https://img.shields.io/pypi/v/llmscout-cli.svg)](https://pypi.org/project/llmscout-cli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
+[Install](#install) • [Quickstart](#quickstart) • [CLI reference](#cli-reference) • [Comparison](#comparison) • [FAQ](#faq) • [Contributing](#contributing)
+
+Runs 21 technical-SEO and GEO (generative-engine-optimization) checks against your site, in pure TypeScript or pure Python, with zero Python interpreter, zero headless browser, and zero external toolchain either way.
+
 </div>
 
 ![Installing llmscout-cli with npm, then running llmscout init and llmscout check against a live site, with the resulting PASS/WARN/FAIL check output in the terminal](./docs/demo.gif)
-
-## Contents
-
-- [Install](#install)
-- [Why GEO checks matter right now](#why-geo-checks-matter-right-now)
-- [Features](#features)
-- [Quickstart](#quickstart)
-- [The 21 checks](#the-21-checks)
-- [CLI reference](#cli-reference)
-- [Fleet mode](#fleet-mode)
-- [Library API reference](#library-api-reference)
-- [Comparison](#comparison)
-- [What is LLMScout, and why does it exist](#what-is-llmscout-and-why-does-it-exist)
-- [FAQ](#faq)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Install
 
@@ -42,6 +28,9 @@ llmscout check ./my-site
 ```
 
 The CLI targets Node 18+ (declared in `package.json` `engines`). The two runtime dependencies are `cheerio` (HTML parsing) and `commander` (argument parsing): there is no Python interpreter, no `pip install`, and no Playwright/Chromium download anywhere in the npm install.
+
+> [!NOTE]
+> The npm install pulls in `undici` as a transitive dependency of `cheerio`. `npm audit` has flagged a high-severity advisory against it in the past; `package.json`'s `overrides` block pins `undici` (and `js-yaml`/`nanoid`) to patched ranges to close it. Run `npm audit` after install to confirm your resolved tree is clean.
 
 **Python (PyPI):**
 
@@ -60,28 +49,6 @@ llmscout init .
 ```
 
 That scaffolds a `llmscout.json` config and a small Claude Code skill file into the target directory. Set your site URL and run `llmscout check .`.
-
-## Why GEO checks matter right now
-
-Search traffic is genuinely shifting toward AI-mediated answers, and the shift is recent and well measured, not a hypothetical:
-
-- **Google's own AI Overviews are already cutting click-through.** Ahrefs measured position-1 CTR on AI-Overview-triggering keywords fall from 7.3% (December 2023) to 1.6% (December 2025) -- a 58% average CTR reduction across the study. ([Ahrefs, December 2025](https://ahrefs.com/blog/ai-overviews-reduce-clicks-update/)) Semrush's independent 10-million-keyword analysis found organic CTR drops 61% and paid CTR drops 68% when an AI Overview appears on the results page. ([Semrush](https://www.semrush.com/blog/semrush-ai-overviews-study/))
-- **ChatGPT itself is now a real, measurable traffic source.** Search Engine Land's analysis of 6.77 million sessions found ChatGPT accounts for 92% of all AI-assistant referral traffic, converting at 7.1% -- close to paid search's 7.8%. ([Search Engine Land](https://searchengineland.com/chatgpt-ai-referral-traffic-sessions-data-481630))
-- **AI crawlers are not one crawler anymore.** Between May 2024 and May 2025, GPTBot's share of AI-crawler traffic rose from 5% to 30%. OpenAI and Anthropic have since split their bots into training crawlers (GPTBot, ClaudeBot) and separate, independently blockable search/retrieval crawlers (OAI-SearchBot, Claude-SearchBot). ([Cloudflare Radar, "From Googlebot to GPTBot"](https://blog.cloudflare.com/from-googlebot-to-gptbot-whos-crawling-your-site-in-2025/)) LLMScout's `ai-crawler-directives` check reports on all seven of the current major training and search bots (GPTBot, OAI-SearchBot, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended) separately, since blocking a company's training bot has no effect on whether its assistant can still retrieve and cite your page live through its own search bot.
-- **Markdown-native delivery is a real, emerging practice, not a fad.** Cloudflare documents HTTP content negotiation (`Accept: text/markdown`) as a standards-based way to serve agents a lighter, cleaner representation of a page -- their own benchmark saw an 80% token reduction on one blog post. ([Cloudflare, "Markdown for Agents"](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/)) Worth being honest about the current state: independent analysis across 300,000 domains found that in practice, no major AI crawler currently sends the `Accept: text/markdown` header to actually negotiate it yet -- they discover Markdown only via direct links. ([Dries Buytaert](https://dri.es/markdown-llms-txt-and-ai-crawlers)) LLMScout's `markdown-negotiation` check reports on this without pretending the ecosystem is further along than it is.
-- **Not every signal in this space is settled, and LLMScout does not pretend otherwise.** `llms.txt` is a real, community-driven convention (created September 2024, adopted by roughly 8-10% of top sites as of mid-2026, including Anthropic, Stripe, Cloudflare, and Vercel) -- but Google's own Gary Illyes has stated publicly that Google does not support it and has no plans to, comparing it to the deprecated `keywords` meta tag. ([Search Engine Journal](https://www.searchenginejournal.com/google-says-llms-txt-comparable-to-keywords-meta-tag/544804/)) LLMScout's `llms-txt` check reports its presence as informational, never as a required pass -- the tool's job is to report what is actually configured, not to prescribe a policy the evidence doesn't yet support.
-- **Google removed FAQ rich results from Search entirely on May 7, 2026.** ([Search Engine Journal](https://www.searchenginejournal.com/google-drops-faq-rich-results-from-search/574429/)) `FAQPage` schema itself is not deprecated -- it remains valid markup other engines and AI assistants can still parse for direct-answer extraction -- so LLMScout's `faq-schema` check still reports on it, just without implying it earns a Google SERP rich result anymore.
-
-## Features
-
-- **21 checks across two categories.** 12 technical-SEO checks and 9 GEO checks, listed by name in [The 21 checks](#the-21-checks).
-- **Zero external toolchain, either language.** `child_process` is never imported anywhere in the TypeScript source; the Python port has zero runtime dependencies. Checks run inside the process instead of shelling out to Python scripts or a headless browser.
-- **Cross-platform by construction.** No `python3`-versus-`py -3` shelling and no relative-path script resolution, so the same install runs identically on Windows, macOS, and Linux.
-- **Hardened fetch.** The single fetch wrapper (`src/fetch-utils.ts`) rejects any non-`http(s)` scheme, blocks loopback/private/link-local hosts, follows redirects manually one hop at a time, and bounds the chain at 5 hops and the response body at 10 MiB.
-- **Fleet mode with per-site reports.** `llmscout fleet manifest.json` runs the full suite across many local client-repo paths in one invocation, and `--out-dir` writes one auto-named report file per site -- built for agencies checking many client sites at once.
-- **Structured output.** Every command accepts a global `--json` flag for machine-readable output, so an agent invoking the CLI can parse results programmatically.
-- **A real, configurable User-Agent.** Sends a genuine browser User-Agent by default (some SSR frameworks and CDNs reject bot-style strings outright) and a `--user-agent` flag to override it.
-- **Well tested.** 248 TypeScript tests and 233 Python tests, both reproducible locally with `npm test` / `npm run test:coverage` and `pytest`. The Python distribution has zero runtime dependencies, so there is nothing for a dependency audit to flag. On the npm side, `npm audit` currently reports one high-severity advisory in `undici`, a transitive dependency pulled in by `cheerio`, not in this project's own code.
 
 ## Quickstart
 
@@ -208,6 +175,28 @@ llmscout --json check ./my-site
 ![Running llmscout --json check to produce structured JSON output with per-check id, status, message, and fix fields plus a summary object](./docs/json-output.gif)
 
 `check` exits `0` when no check FAILs, `1` when at least one check FAILs (WARN alone does not fail the run), and `2` on a usage error such as a missing or misconfigured `llmscout.json`.
+
+## Features
+
+- **21 checks across two categories.** 12 technical-SEO checks and 9 GEO checks, listed by name in [The 21 checks](#the-21-checks).
+- **Zero external toolchain, either language.** `child_process` is never imported anywhere in the TypeScript source; the Python port has zero runtime dependencies. Checks run inside the process instead of shelling out to Python scripts or a headless browser.
+- **Cross-platform by construction.** No `python3`-versus-`py -3` shelling and no relative-path script resolution, so the same install runs identically on Windows, macOS, and Linux.
+- **Hardened fetch.** The single fetch wrapper (`src/fetch-utils.ts`) rejects any non-`http(s)` scheme, blocks loopback/private/link-local hosts, follows redirects manually one hop at a time, and bounds the chain at 5 hops and the response body at 10 MiB.
+- **Fleet mode with per-site reports.** `llmscout fleet manifest.json` runs the full suite across many local client-repo paths in one invocation, and `--out-dir` writes one auto-named report file per site -- built for agencies checking many client sites at once.
+- **Structured output.** Every command accepts a global `--json` flag for machine-readable output, so an agent invoking the CLI can parse results programmatically.
+- **A real, configurable User-Agent.** Sends a genuine browser User-Agent by default (some SSR frameworks and CDNs reject bot-style strings outright) and a `--user-agent` flag to override it.
+- **Well tested.** 248 TypeScript tests and 233 Python tests, both reproducible locally with `npm test` / `npm run test:coverage` and `pytest`. The Python distribution has zero runtime dependencies, so there is nothing for a dependency audit to flag. On the npm side, `npm audit` currently reports one high-severity advisory in `undici`, a transitive dependency pulled in by `cheerio`, not in this project's own code.
+
+## Why GEO checks matter right now
+
+Search traffic is genuinely shifting toward AI-mediated answers, and the shift is recent and well measured, not a hypothetical:
+
+- **Google's own AI Overviews are already cutting click-through.** Ahrefs measured position-1 CTR on AI-Overview-triggering keywords fall from 7.3% (December 2023) to 1.6% (December 2025) -- a 58% average CTR reduction across the study. ([Ahrefs, December 2025](https://ahrefs.com/blog/ai-overviews-reduce-clicks-update/)) Semrush's independent 10-million-keyword analysis found organic CTR drops 61% and paid CTR drops 68% when an AI Overview appears on the results page. ([Semrush](https://www.semrush.com/blog/semrush-ai-overviews-study/))
+- **ChatGPT itself is now a real, measurable traffic source.** Search Engine Land's analysis of 6.77 million sessions found ChatGPT accounts for 92% of all AI-assistant referral traffic, converting at 7.1% -- close to paid search's 7.8%. ([Search Engine Land](https://searchengineland.com/chatgpt-ai-referral-traffic-sessions-data-481630))
+- **AI crawlers are not one crawler anymore.** Between May 2024 and May 2025, GPTBot's share of AI-crawler traffic rose from 5% to 30%. OpenAI and Anthropic have since split their bots into training crawlers (GPTBot, ClaudeBot) and separate, independently blockable search/retrieval crawlers (OAI-SearchBot, Claude-SearchBot). ([Cloudflare Radar, "From Googlebot to GPTBot"](https://blog.cloudflare.com/from-googlebot-to-gptbot-whos-crawling-your-site-in-2025/)) LLMScout's `ai-crawler-directives` check reports on all seven of the current major training and search bots (GPTBot, OAI-SearchBot, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended) separately, since blocking a company's training bot has no effect on whether its assistant can still retrieve and cite your page live through its own search bot.
+- **Markdown-native delivery is a real, emerging practice, not a fad.** Cloudflare documents HTTP content negotiation (`Accept: text/markdown`) as a standards-based way to serve agents a lighter, cleaner representation of a page -- their own benchmark saw an 80% token reduction on one blog post. ([Cloudflare, "Markdown for Agents"](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/)) Worth being honest about the current state: independent analysis across 300,000 domains found that in practice, no major AI crawler currently sends the `Accept: text/markdown` header to actually negotiate it yet -- they discover Markdown only via direct links. ([Dries Buytaert](https://dri.es/markdown-llms-txt-and-ai-crawlers)) LLMScout's `markdown-negotiation` check reports on this without pretending the ecosystem is further along than it is.
+- **Not every signal in this space is settled, and LLMScout does not pretend otherwise.** `llms.txt` is a real, community-driven convention (created September 2024, adopted by roughly 8-10% of top sites as of mid-2026, including Anthropic, Stripe, Cloudflare, and Vercel) -- but Google's own Gary Illyes has stated publicly that Google does not support it and has no plans to, comparing it to the deprecated `keywords` meta tag. ([Search Engine Journal](https://www.searchenginejournal.com/google-says-llms-txt-comparable-to-keywords-meta-tag/544804/)) LLMScout's `llms-txt` check reports its presence as informational, never as a required pass -- the tool's job is to report what is actually configured, not to prescribe a policy the evidence doesn't yet support.
+- **Google removed FAQ rich results from Search entirely on May 7, 2026.** ([Search Engine Journal](https://www.searchenginejournal.com/google-drops-faq-rich-results-from-search/574429/)) `FAQPage` schema itself is not deprecated -- it remains valid markup other engines and AI assistants can still parse for direct-answer extraction -- so LLMScout's `faq-schema` check still reports on it, just without implying it earns a Google SERP rich result anymore.
 
 ## The 21 checks
 
