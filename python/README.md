@@ -1,5 +1,9 @@
 # llmscout-cli (Python)
 
+<!-- mcp-name: io.github.RudrenduPaul/llmscout -->
+<!-- Ownership-proof string for registry.modelcontextprotocol.io publishing. Do not remove. -->
+
+
 Zero-config SEO and GEO (generative engine optimization) checker: 21 checks
 against a live site, plus a multi-site fleet mode for agencies checking
 several client sites at once, in pure Python with no extra runtime
