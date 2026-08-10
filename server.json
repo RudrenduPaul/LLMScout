@@ -1,0 +1,35 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.RudrenduPaul/llmscout",
+  "description": "Zero-config SEO and GEO checker: 21 technical-SEO and generative-engine checks for a live site.",
+  "repository": {
+    "url": "https://github.com/RudrenduPaul/LLMScout",
+    "source": "github"
+  },
+  "version": "0.3.7",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "llmscout-cli",
+      "version": "0.3.7",
+      "runtimeHint": "uvx",
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "--from",
+          "value": "llmscout-cli"
+        }
+      ],
+      "packageArguments": [
+        {
+          "type": "positional",
+          "valueHint": "script_name",
+          "value": "llmscout-mcp"
+        }
+      ],
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
