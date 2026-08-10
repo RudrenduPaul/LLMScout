@@ -281,6 +281,41 @@ Commands:
 | `1` | `check`: at least one check FAILed. `fleet`: at least one site FAILed or errored. |
 | `2` | Usage error: invalid URL scheme, missing/unreadable/invalid `llmscout.json`, blank `siteUrl`, missing manifest, or any other configuration error. |
 
+## MCP Server
+
+LLMScout ships a [Model Context Protocol](https://modelcontextprotocol.io) server so an AI agent
+(Claude, Cursor, or any MCP-compatible client) can run SEO/GEO checks against a live site directly,
+without a human invoking the CLI by hand.
+
+Install the extra:
+
+```bash
+pip install "llmscout-cli[mcp]"
+```
+
+Add it to your MCP client's config (for Claude Desktop, `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "llmscout": {
+      "command": "uvx",
+      "args": ["--from", "llmscout-cli", "llmscout-mcp"]
+    }
+  }
+}
+```
+
+The server exposes one tool, `run`, that shells out to the published `llmscout` npm binary with the
+given subcommand and arguments plus `--json`, and returns the parsed JSON result:
+
+```
+run(["check", "./my-site", "--site-url", "https://example.com"])
+```
+
+Transport is stdio, so there is nothing to host: the MCP client spawns the server as a local
+subprocess. Source: [`python/src/llmscout/mcp_server.py`](python/src/llmscout/mcp_server.py).
+
 ## Fleet mode
 
 ![Running cat fleet.json to show a two-site manifest, then llmscout fleet ./fleet.json checking both sites and printing a per-site PASS/FAIL summary](./docs/usage.gif)
