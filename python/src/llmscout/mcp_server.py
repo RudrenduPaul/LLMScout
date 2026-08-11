@@ -40,27 +40,23 @@ def _base_command() -> list[str]:
     return ["npx", "llmscout"]
 
 
-def _capture_help() -> str:
-    """Best-effort `--help` capture, used as the tool's dynamic description
-    instead of a hardcoded string."""
-    fallback = "Run the llmscout CLI (init/check/fleet subcommands)."
-    try:
-        proc = subprocess.run(
-            [*_base_command(), "--help"],
-            capture_output=True,
-            text=True,
-            timeout=15,
-        )
-        return proc.stdout.strip() or fallback
-    except Exception as exc:  # noqa: BLE001 - degrade to a generic description
-        print(f"llmscout-mcp: could not capture --help: {exc}", file=sys.stderr)
-        return fallback
+_TOOL_DESCRIPTION = """Run the llmscout CLI (published as `llmscout-cli` on npm and PyPI) and return its structured output as JSON. Call this to scaffold an SEO/GEO config for a local project, run llmscout's 21-check technical-SEO and generative-engine-optimization audit against a site, or batch-run that audit across a fleet of sites, without shelling out yourself.
+
+Call it once you have a local project directory path, and for `check`/`fleet` a site that already has an `llmscout.json` (created by a prior `init` call, or already present in the project). Do not call `check` on a directory that has never been `init`-ed: it fails fast with a missing-config error rather than guessing a site URL. No API key or auth is required. `check` and `fleet` make live outbound HTTP requests to the target site(s) (the page itself, robots.txt, sitemap.xml, and related resources) so they need network access and will be slower or noisier against unreachable hosts; `init` only writes local files (a config and a small skill file) and makes no network calls. All subcommands are safe to re-run: `init` overwrites its scaffolded config, and `check`/`fleet` never write anything unless `--out-dir` is given, in which case a report file is rewritten each run. On failure (non-zero exit, bad args, unreachable site), the underlying process's stderr is captured rather than raised.
+
+`args` is a list[str] of the CLI's own argv, split exactly as you would type it on a command line (never a single shell string), and should never include `--json` yourself since this wrapper appends it automatically. Real examples:
+  - ["init", "./my-site", "--site-url", "https://example.com"]
+  - ["check", "./my-site", "--out-dir", "./reports"]
+  - ["fleet", "./fleet.json", "--out-dir", "./reports"]
+Pass ["--help"] or ["<subcommand>", "--help"] (e.g. ["check", "--help"]) as `args` to discover the live, authoritative list of subcommands and flags.
+
+Returns a dict. On success it is the parsed JSON the CLI printed: `init` returns the scaffolded config paths, `check` returns {siteUrl, summary: {pass, warn, fail, total}, results: [{id, name, category, status, message, fix?}, ...]}, and `fleet` returns one such result per site. On failure it returns {"error": ..., "stderr": ..., "command": ...} if the CLI exited non-zero, or {"error": ..., "stdout": ..., "command": ...} if stdout was not valid JSON; it never raises."""
 
 
 mcp = MCPServer(name="llmscout")
 
 
-@mcp.tool(description=_capture_help())
+@mcp.tool(description=_TOOL_DESCRIPTION)
 def run(args: list[str]) -> dict[str, Any]:
     """Run the llmscout CLI with `args` (subcommand + its own arguments,
     e.g. ["init", "/path/to/project", "--site-url", "https://example.com"])
