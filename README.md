@@ -9,6 +9,8 @@
 
 [Install](#install) • [Quickstart](#quickstart) • [CLI reference](#cli-reference) • [Comparison](#comparison) • [FAQ](#faq) • [Contributing](#contributing)
 
+<a href="https://www.producthunt.com/products/llmscout?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-llmscout" target="_blank" rel="noopener noreferrer"><img alt="LLMScout - Check if LLMs can cite your site. | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1220466&theme=light&t=1786881904540"></a>
+
 Runs 21 technical-SEO and GEO (generative-engine-optimization) checks against your site, in pure TypeScript or pure Python, with zero Python interpreter, zero headless browser, and zero external toolchain either way.
 
 </div>
