@@ -5,6 +5,26 @@ changelog covers both distributions -- the npm package (`llmscout-cli`,
 TypeScript) and the PyPI package (`llmscout-cli`, Python) -- since they
 run the same checks; entries note which distribution they apply to.
 
+## [0.3.8] - 2026-08-24
+
+### Fixed
+
+- npm (`package.json`, `package-lock.json`) and the MCP `server.json`
+  manifest had drifted from the PyPI distribution's already-published
+  `0.3.8`: npm was still at `0.3.6` and `server.json` still declared
+  `0.3.7` for the PyPI package it wraps. All three now report `0.3.8`.
+- `SECURITY.md`'s supported-versions table was stuck at the `0.1.x` line
+  from the pre-rename release; it now reflects the actual current `0.3.x`
+  line for both distributions.
+- README's "well tested" claim said `npm audit` currently reports a
+  high-severity `undici` advisory; the `package.json` `overrides` pin
+  already closes that advisory (confirmed via a fresh `npm audit`: 0
+  vulnerabilities), so the claim was stale and has been corrected.
+- `codeql.yml` referenced `actions/checkout@v4` and
+  `github/codeql-action/{init,autobuild,analyze}@v3` by mutable tag,
+  unlike the SHA-pinned `ci.yml` and `publish-pypi.yml`. All four are now
+  pinned to their release commit SHA, comment-annotated with the version.
+
 ## [0.3.6] (npm) / [0.3.5] (PyPI) - 2026-08-08
 
 ### Fixed
