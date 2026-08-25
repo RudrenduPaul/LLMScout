@@ -6,12 +6,12 @@
     "url": "https://github.com/RudrenduPaul/LLMScout",
     "source": "github"
   },
-  "version": "0.3.7",
+  "version": "0.3.8",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "llmscout-cli",
-      "version": "0.3.7",
+      "version": "0.3.8",
       "runtimeHint": "uvx",
       "runtimeArguments": [
         {

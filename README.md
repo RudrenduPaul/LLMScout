@@ -187,7 +187,7 @@ llmscout --json check ./my-site
 - **Fleet mode with per-site reports.** `llmscout fleet manifest.json` runs the full suite across many local client-repo paths in one invocation, and `--out-dir` writes one auto-named report file per site -- built for agencies checking many client sites at once.
 - **Structured output.** Every command accepts a global `--json` flag for machine-readable output, so an agent invoking the CLI can parse results programmatically.
 - **A real, configurable User-Agent.** Sends a genuine browser User-Agent by default (some SSR frameworks and CDNs reject bot-style strings outright) and a `--user-agent` flag to override it.
-- **Well tested.** 248 TypeScript tests and 233 Python tests, both reproducible locally with `npm test` / `npm run test:coverage` and `pytest`. The Python distribution has zero runtime dependencies, so there is nothing for a dependency audit to flag. On the npm side, `npm audit` currently reports one high-severity advisory in `undici`, a transitive dependency pulled in by `cheerio`, not in this project's own code.
+- **Well tested.** 248 TypeScript tests and 233 Python tests, both reproducible locally with `npm test` / `npm run test:coverage` and `pytest`. The Python distribution has zero runtime dependencies, so there is nothing for a dependency audit to flag. On the npm side, `package.json`'s `overrides` block pins `undici` (a transitive dependency of `cheerio`) to a patched range, and `npm audit` currently reports zero vulnerabilities.
 
 ## Why GEO checks matter right now
 
