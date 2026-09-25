@@ -1,6 +1,6 @@
 {
   "name": "llmscout-cli",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "description": "Cross-platform LLM/GEO/AEO checker CLI in TypeScript. 21 technical-SEO and generative-engine-optimization checks, two runtime dependencies (cheerio, commander), no Python interpreter or headless browser required.",
   "keywords": [
     "llm",

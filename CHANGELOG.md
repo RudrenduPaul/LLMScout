@@ -5,6 +5,20 @@ changelog covers both distributions -- the npm package (`llmscout-cli`,
 TypeScript) and the PyPI package (`llmscout-cli`, Python) -- since they
 run the same checks; entries note which distribution they apply to.
 
+## [0.4.0] (npm) - 2026-09-24
+
+### Changed
+
+- Runtime dependency `commander` upgraded from `^12.1.0` to `^13.1.0`. The
+  supported Node floor is unchanged (`>=18`).
+- Development dependencies upgraded (TypeScript 6, ESLint 10 with a flat
+  config, typescript-eslint 8, `@types/node` 26). No change to shipped
+  behavior.
+- npm releases are now published through npm Trusted Publishing (GitHub
+  Actions OIDC, no long-lived token) from `.github/workflows/publish-npm.yml`.
+- The PyPI distribution is unchanged and stays at `0.3.8`; npm moves to
+  `0.4.0` (the previous npm release on the registry was `0.3.6`).
+
 ## [0.3.8] - 2026-08-24
 
 ### Fixed
